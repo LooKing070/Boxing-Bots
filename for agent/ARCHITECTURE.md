@@ -31,7 +31,11 @@ ARC-3.2 CollisionHandler: запросы против ФАКТИЧЕСКИХ п�
 следуют визуальной модели, MEC-5.1); куб-хитбокс кулака FIST_HITBOX_SIZE (для культи —
 VOXEL_SIZE у края остатка); проверка остановки на первом контакте; проверка «попадание по
 рукам позы» для баффов блока; push-коллизия ботов (off во время кувырка).
-ARC-3.2 CollisionHandler: возврат списка по глубине (MEC-2.1); проверка «попадание по рукам позы» для MEC-4.0.
+ARC-3.2 CollisionHandler: все запросы — по ФАКТИЧЕСКИМ позициям вокселей текущей визуальной
+позы (MEC-5.1: стойка/присед/нокдаун/кувырок/разворот/культя); куб-хитбокс кулака
+FIST_HITBOX_SIZE (культя — VOXEL_SIZE у края остатка); остановка удара на первом контакте;
+проверка «контакт с кубами блокирующей руки» для баффов; push-коллизия ботов ВСЕГДА
+включена (включая кувырок — перелёт обеспечивается дугой, а не отключением коллизии).
 ARC-3.3 Мусор: динамические тела обломков; авто-sleep.
 
 ## 4. ENTITIES
@@ -50,22 +54,20 @@ ARC-5.2 LimbDetachmentSystem: traverse → detached (скелет+обшивка
 импульс; компоненты помечаются уничтоженными (MEC-2.4/2.7); сеть: LimbDetachmentEvent.
 ARC-5.3 DebuffManager: дебаффы, производные статов, триггер надписей.
 ARC-5.4 StrikeSystem: таймлайн кадров с индивидуальными длительностями; возврат в стойку
-за ACTION_GAP_MS; урон по формуле MEC-3.2; ≤1 попадания на куб от каждого кулака; остановка
-на первом контакте; кулдауны слотовый + глобальный.
-ARC-5.5 BlockSystem: условия MEC-4.0/4.6/4.7 (воздух запрещён; ходьба ×0.5; удары запрещены;
-культя); стамина MEC-4.2; баффы MEC-4.3.
+за ACTION_GAP_MS; урон по MEC-3.2 (без параметра силы); ≤1 попадания на куб от каждого
+кулака; кулдауны слотовый + глобальный.
+ARC-5.5 BlockSystem: фиксированные значения баффов (MEC-4.3); слоты всегда активны;
+зона баффов = уцелевшие кубы блокирующей руки (MEC-4.7); поза блока мгновенна;
+ограничения MEC-4.6 (воздух, ходьба ×0.5, запрет ударов во время блока).
 ARC-5.6 BalanceSystem: wobble/падения, потеря опоры.
 ARC-5.7 AISystem: FSM MEC-6 на тех же Systems.
 
 ## 6. РЕДАКТОР
-ARC-6.1 KinematicTimeline: кадры = {point:Vec3, duration:0.2–1.0}; валидация ±EDITOR_RANGE,
-n ≤ FRAMES_MAX.
-ARC-6.2 StrikeSerializer: удар {slot, hand, force, frames:[{p:Vec3, d:number}]};
-блок {slot, hand, buff, reductionPct, returnPct, frame:Vec3}; ≤ PRESET_BYTES_MAX
-(6 кадров × 16 Б + заголовок ≈ 120 Б).
-ARC-6.2 StrikeSerializer: пресет → параметрический формат ≤ PRESET_BYTES_MAX:
-удар {slot, hand, force, speed, frames: Vec3[]}; блок {slot, hand, buff, reduction, return, frame}.
-generateHitboxPath(preset, t) — позиция куба-хитбокса по полилинии; детерминированно на клиенте и хосте.
+ARC-6.1 KinematicTimeline: кадры удара = {point:Vec3, duration:0.2–1.0}; кадр блока =
+{point:Vec3} без длительности; валидация ±EDITOR_RANGE, n ≤ FRAMES_MAX.
+ARC-6.2 StrikeSerializer: удар {slot, hand, frames:[{p:Vec3, d:number}]};
+блок {slot, hand, buff:'fortification'|'counterstrike', frame:Vec3};
+значения баффов НЕ передаются (фиксированы в shared-константах); ≤ PRESET_BYTES_MAX.
 
 ## 7. СЕТЬ (клиент/хост) — детали в NETWORK.md
 LobbyClient, PeerConnection, HostSimulator (headless Rapier + все Systems авторитетно),
