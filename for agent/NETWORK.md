@@ -13,6 +13,9 @@ NET-2.2 Pre-match: обмен версиями констант, пресета�
 NET-2.3 Старт: синхронный countdown 3 с от хост-тика.
 NET-2.4 Бой: снапшоты NET_SNAPSHOT_HZ; инпуты каждый физический тик.
 NET-2.5 Завершение: MatchEnd (knockout|timeout|host_left|guest_timeout|draw).
+NET-2.6 Реванш PvP: оба клиента отправляют RematchVote; хост перезапускает комнату
+(сброс состояния, те же пресеты) только при ready обоих; отказ/выход — по NET-6.
+interface RematchVote { playerId: string; ready: boolean; }
 
 ## 3. DTO (контракты)
 // Клиент → Хост
