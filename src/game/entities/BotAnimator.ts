@@ -186,7 +186,7 @@ export class BotAnimator {
   private glitchOff: Vec3 = { x: 0, y: 0, z: 0 }
   private glitchFramesLeft = 0
 
-  constructor(data: BotData, grid: { worldPos: Float32Array; worldAngle: Float32Array; worldScale: Float32Array }) {
+  constructor(data: BotData, grid: { worldPos: Float32Array; worldAngle: Float32Array; worldScale: Float32Array; worldQuat: Float32Array }) {
     this.data = data
     this.grid = grid
     this.pivots = [
